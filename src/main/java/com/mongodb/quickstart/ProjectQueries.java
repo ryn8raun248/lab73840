@@ -26,6 +26,26 @@ public class ProjectQueries {
     }
 
 
+    public static void query4(MongoDatabase db){
+
+    }
+
+    public static void query5(MongoDatabase db){
+
+    }
+
+    public static void query6(MongoDatabase db){
+
+    }
+
+    public static void query7(MongoDatabase db){
+
+    }
+
+    public static void query8(MongoDatabase db){
+
+    }
+
     public static void main(String[] args) {
 
         // https://docs.oracle.com/javase/7/docs/api/java/util/logging/Level.html#SEVERE gets rid of logging console output
@@ -35,7 +55,11 @@ public class ProjectQueries {
         try (MongoClient mongoClient = MongoClients.create(System.getProperty("mongodb.uri"))) {
             MongoDatabase db = mongoClient.getDatabase("videos");
             query3(db);
-
+            query4(db);
+            query5(db);
+            query6(db);
+            query7(db);
+            query8(db);
 
         }
     }
