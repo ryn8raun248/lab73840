@@ -20,13 +20,25 @@ public class ProjectQueries {
         AggregateIterable<Document> counts = videoColl.aggregate(Collections.singletonList(
                 group("$category", Accumulators.sum("count", 1))));
 
-        for (Document d : counts) {
-            System.out.println(d.get("_id") + ": " + d.get("count"));
+        for (Document doc : counts) {
+            System.out.println(doc.get("_id") + ": " + doc.get("count"));
         }
+        System.out.println(" ");
     }
 
 
     public static void query4(MongoDatabase db){
+    // List the number of videos for each video category where the inventory is non-zero.
+        MongoCollection<Document> videoColl = db.getCollection("video_recordings");
+        System.out.println("Query 4:");
+        AggregateIterable<Document> nonZeroCounts = videoColl.aggregate(Arrays.asList(
+                match(Filters.gt("stock_count", 0)),
+                group("$category", Accumulators.sum("count", 1))));
+
+        for (Document doc : nonZeroCounts) {
+            System.out.println(doc.get("_id") + ": " + doc.get("count"));
+        }
+        System.out.println(" ");
 
     }
 
