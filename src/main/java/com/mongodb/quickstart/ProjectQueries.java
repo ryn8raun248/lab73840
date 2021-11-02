@@ -43,18 +43,29 @@ public class ProjectQueries {
     }
 
     public static void query5(MongoDatabase db){
+        // For each actor, list the video categories.
+
+
 
     }
 
     public static void query6(MongoDatabase db){
+    //   Which actors have appeared in movies in different video categories?
+
+
 
     }
 
     public static void query7(MongoDatabase db){
+        // Which actors have not appeared in a comedy?
+
 
     }
 
     public static void query8(MongoDatabase db){
+        // Which actors have appeared in comedy and action adventure movies?
+
+
 
     }
 
