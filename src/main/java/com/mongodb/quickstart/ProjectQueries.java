@@ -44,7 +44,7 @@ public class ProjectQueries {
 
     public static void query5(MongoDatabase db){
         // For each actor, list the video categories.
-
+        // use the $lookup command to join collections
 
 
     }
