@@ -2,16 +2,18 @@ package com.mongodb.quickstart;
 
 import com.mongodb.client.*;
 import com.mongodb.client.model.Accumulators;
+
 import com.mongodb.client.model.Filters;
 import org.bson.Document;
+import org.bson.conversions.Bson;
 
+import javax.print.Doc;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.mongodb.client.model.Aggregates.*;
 public class ProjectQueries {
-
 
     public static void query3(MongoDatabase db){
         // Number of videos for each category
@@ -35,6 +37,7 @@ public class ProjectQueries {
                 match(Filters.gt("stock_count", 0)),
                 group("$category", Accumulators.sum("count", 1))));
 
+
         for (Document doc : nonZeroCounts) {
             System.out.println(doc.get("_id") + ": " + doc.get("count"));
         }
@@ -45,6 +48,24 @@ public class ProjectQueries {
     public static void query5(MongoDatabase db){
         // For each actor, list the video categories.
         // use the $lookup command to join collections
+        MongoCollection<Document> video_actors = db.getCollection("video_actors");
+        MongoCollection<Document> video_recordings = db.getCollection("video_recordings");
+        System.out.println("Query 5:");
+
+        Bson lookupPipeline = lookup("video_recordings", "recording_id", "recording_id", "recording");
+        Bson unwindPipeline = unwind("$recording");
+
+        Bson groupPipeline = group("$name");
+
+        AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
+                lookupPipeline, groupPipeline
+        ));
+
+        for(Document doc : temp){
+            System.out.println(doc.get("_id"));
+        }
+
+
 
 
     }
@@ -64,9 +85,9 @@ public class ProjectQueries {
 
     public static void query8(MongoDatabase db){
         // Which actors have appeared in comedy and action adventure movies?
-
-
-
+        MongoCollection<Document> video_actors = db.getCollection("video_actors");
+        MongoCollection<Document> video_recordings = db.getCollection("video_recordings");
+        System.out.println("Query 8:");
     }
 
     public static void main(String[] args) {
