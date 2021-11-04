@@ -7,13 +7,17 @@ import com.mongodb.client.model.Filters;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import javax.print.Doc;
+
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.mongodb.client.model.Aggregates.*;
 public class ProjectQueries {
+
+    public static void scraper(){
+
+    }
 
     public static void query3(MongoDatabase db){
         // Number of videos for each category
@@ -58,11 +62,11 @@ public class ProjectQueries {
         Bson groupPipeline = group("$name");
 
         AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
-                lookupPipeline, groupPipeline
+                lookupPipeline
         ));
 
         for(Document doc : temp){
-            System.out.println(doc.get("_id"));
+            System.out.println(doc);
         }
     }
 
@@ -128,8 +132,8 @@ public class ProjectQueries {
 
 //            query3(db);
 //            query4(db);
-//            query5(db);
-            query5_2(db_test);
+            query5(db);
+//            query5_2(db_test);
             query6(db);
             query7(db);
             query8(db);
