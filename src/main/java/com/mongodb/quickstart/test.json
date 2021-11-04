@@ -1,0 +1,29 @@
+[
+
+ {
+  "recording_id" : 3000,
+  "title" : "Apocalypse Now",
+  "category" : "Action & Adventure",
+  "image_name" : "apocalypse_now.gif",
+  "price" : 22.99,
+  "duration" : 9180,
+  "rating" : "R",
+  "director" : "Francis Ford Coppola",
+  "stock_count" : 0,
+  "year_released" : 1979,
+  "actors" : "actor1, actor2, actor3"
+ },
+ {
+  "recording_id" : 3001,
+  "title" : "Bad Boys",
+  "category" : "Fiction",
+  "image_name" : "badboys.gif",
+  "price" : 15.99,
+  "duration" : 7140,
+  "rating" : "R",
+  "director" : "Michael Bay",
+  "stock_count" : 782,
+  "year_released" : 1995,
+  "actors" : "actor4, actor5, actor2"
+ }
+]

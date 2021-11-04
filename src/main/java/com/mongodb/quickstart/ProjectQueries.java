@@ -64,10 +64,36 @@ public class ProjectQueries {
         for(Document doc : temp){
             System.out.println(doc.get("_id"));
         }
+    }
 
+    public static void query5_2(MongoDatabase db){
+        MongoCollection<Document> collection = db.getCollection("videoDB");
+        Map<String, ArrayList<String>> actorWithCategories = new HashMap<>();
 
+        for (Document recording : collection.find()) { // every recording
+            String category = recording.get("category").toString();
+            String[] actorsList = recording.get("actors").toString().split(",");
 
+            for (String actor : actorsList) { // sort through each actor in current recording
+                ArrayList<String> categories;
 
+                if (!actorWithCategories.containsKey(actor)) { // actor doesn't already exist in the map
+                    categories = new ArrayList<>();
+                } else {
+                    categories = actorWithCategories.get(actor);
+
+                }
+                if (!categories.contains(category)) { // If the category not already in the actor's list
+                    categories.add(category);
+                }
+                actorWithCategories.put(actor, categories);
+            }
+        }
+
+        for (Map.Entry<String, ArrayList<String>> actor : actorWithCategories.entrySet()) {
+            System.out.println(actor.getKey() + ": " + actor.getValue().toString());
+        }
+        System.out.println(" ");
     }
 
     public static void query6(MongoDatabase db){
@@ -98,9 +124,12 @@ public class ProjectQueries {
 
         try (MongoClient mongoClient = MongoClients.create(System.getProperty("mongodb.uri"))) {
             MongoDatabase db = mongoClient.getDatabase("videos");
-            query3(db);
-            query4(db);
-            query5(db);
+            MongoDatabase db_test = mongoClient.getDatabase("test");
+
+//            query3(db);
+//            query4(db);
+//            query5(db);
+            query5_2(db_test);
             query6(db);
             query7(db);
             query8(db);
