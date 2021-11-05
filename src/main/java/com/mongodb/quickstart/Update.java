@@ -9,6 +9,9 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.json.JsonWriterSettings;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static com.mongodb.client.model.Filters.eq;
 import static com.mongodb.client.model.Updates.*;
 
@@ -19,21 +22,27 @@ public class Update {
 
         try (MongoClient mongoClient = MongoClients.create(System.getProperty("mongodb.uri"))) {
             MongoDatabase sampleTrainingDB = mongoClient.getDatabase("test");
+            MongoDatabase sampleTrainingDB2 = mongoClient.getDatabase("test2");
+
             MongoCollection<Document> recordings = sampleTrainingDB.getCollection("videoDB");
-
-
+            MongoCollection<Document> recordings2 = sampleTrainingDB2.getCollection("videoDB");
 
 
             for (Document recording : recordings.find()) { // for each recording
                 String[] actorsList = recording.get("actors").toString().split(","); // get list of actors in each recording
+                ArrayList<Document> docList = new ArrayList<>();
 
                 for (String actor: actorsList){
                     // create new object in array in MongoDB
+                    docList.add(new Document("ActorName", actor));
                 }
 
+                recording.append("actors_new", docList);
+                //recordings.updateOne(recording);
 
+                recordings2.insertOne(recording);
 
-
+                //System.out.println(recording.values());
 
 
                 // update one document
