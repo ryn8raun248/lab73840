@@ -81,15 +81,18 @@ public class ProjectQueries {
     public static void query5(MongoDatabase db){
         // For each actor, list the video categories.
         // use the $lookup command to join collections
-        MongoCollection<Document> video_recordings = db.getCollection("new_video_actors");
+        MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
+        System.out.println("Query 5:");
 
         Bson projectPipeline = project(fields(include("name", "Categories")));
         Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"));
         Bson unwindPipeline = unwind("$Categories");
 
-        AggregateIterable<Document> temp = video_recordings.aggregate(Arrays.asList(
+        AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
             projectPipeline, unwindPipeline, groupPipeline
         ));
+
+
 
         for(Document doc : temp){
             System.out.print(doc.get("_id") + ":");
@@ -100,40 +103,34 @@ public class ProjectQueries {
             }
             System.out.println();
         }
-    }
-
-    public static void query5_2(MongoDatabase db){
-        MongoCollection<Document> collection = db.getCollection("videoDB");
-        Map<String, ArrayList<String>> actorWithCategories = new HashMap<>();
-
-        for (Document recording : collection.find()) { // every recording
-            String category = recording.get("category").toString();
-            String[] actorsList = recording.get("actors").toString().split(",");
-
-            for (String actor : actorsList) { // sort through each actor in current recording
-                ArrayList<String> categories;
-
-                if (!actorWithCategories.containsKey(actor)) { // actor doesn't already exist in the map
-                    categories = new ArrayList<>();
-                } else {
-                    categories = actorWithCategories.get(actor);
-
-                }
-                if (!categories.contains(category)) { // If the category not already in the actor's list
-                    categories.add(category);
-                }
-                actorWithCategories.put(actor, categories);
-            }
-        }
-
-        for (Map.Entry<String, ArrayList<String>> actor : actorWithCategories.entrySet()) {
-            System.out.println(actor.getKey() + ": " + actor.getValue().toString());
-        }
-        System.out.println(" ");
+        System.out.println();
     }
 
     public static void query6(MongoDatabase db){
-    //   Which actors have appeared in movies in different video categories?
+        //Which actors have appeared in movies in different video categories?
+        MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
+
+        System.out.println("Query 6:");
+
+        Bson projectPipeline = project(fields(include("name", "Categories")));
+        Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"),
+                Accumulators.sum("number",1 ));
+        Bson filterPipeline = match(Filters.gt("number", 1));
+
+
+
+        AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
+                projectPipeline, groupPipeline, filterPipeline
+        ));
+
+
+        for(Document doc : temp){
+            System.out.print(doc.get("_id") + ": ");
+
+            System.out.print("Number of categories, " + doc.get("number"));
+            System.out.println();
+        }
+        System.out.println();
 
 
 
@@ -164,8 +161,8 @@ public class ProjectQueries {
 
 //            query3(db);
 //            query4(db);
-            query5(db);
-//            query6(db);
+//            query5(db);
+            query6(db);
 //            query7(db);
 //            query8(db);
 
