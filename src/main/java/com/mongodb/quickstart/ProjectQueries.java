@@ -151,22 +151,23 @@ public class ProjectQueries {
                 projectPipeline, unwindPipeline, groupPipeline
         ));
 
-
         ArrayList<String> actorsNotComedies = new ArrayList<>();
-
         for(Document doc : temp){
+            ArrayList<String> categoriesList = new ArrayList<>();
             ArrayList<Document> docList = (ArrayList)doc.get("Categories");
             String actor = (String) doc.get("_id");
-                for (Document element : docList) {
-                    String categoryType = (String) element.get("Category");
-                    if (!categoryType.contains("Comedy")) {
-                        actorsNotComedies.add(actor);
-                    }
-                }
+
+            for (Document element : docList) {
+                String categoryType = (String) element.get("Category");
+                categoriesList.add(categoryType);
+            }
+            if (!categoriesList.contains("Comedy")) {
+                actorsNotComedies.add(actor);
+            }
         }
         List<String> sortedActorsNotComedies = actorsNotComedies.stream().distinct().collect(Collectors.toList()); // get rid of duplicate actor names
         for (String actor : sortedActorsNotComedies){
-            System.out.println(actor);
+           System.out.println(actor);
         }
         System.out.println();
 
