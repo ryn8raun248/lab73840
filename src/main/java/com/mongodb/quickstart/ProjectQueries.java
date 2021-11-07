@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.Arrays.*;
+import java.util.stream.Collectors;
 
 
 import static com.mongodb.client.model.Aggregates.*;
@@ -139,6 +140,35 @@ public class ProjectQueries {
     public static void query7(MongoDatabase db){
         // Which actors have not appeared in a comedy?
 
+        MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
+        System.out.println("Query 7:" + "\n");
+
+        Bson projectPipeline = project(fields(include("name", "Categories")));
+        Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"));
+        Bson unwindPipeline = unwind("$Categories");
+
+        AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
+                projectPipeline, unwindPipeline, groupPipeline
+        ));
+
+
+        ArrayList<String> actorsNotComedies = new ArrayList<>();
+
+        for(Document doc : temp){
+            ArrayList<Document> docList = (ArrayList)doc.get("Categories");
+            String actor = (String) doc.get("_id");
+                for (Document element : docList) {
+                    String categoryType = (String) element.get("Category");
+                    if (!categoryType.contains("Comedy")) {
+                        actorsNotComedies.add(actor);
+                    }
+                }
+        }
+        List<String> sortedActorsNotComedies = actorsNotComedies.stream().distinct().collect(Collectors.toList()); // get rid of duplicate actor names
+        for (String actor : sortedActorsNotComedies){
+            System.out.println(actor);
+        }
+        System.out.println();
 
     }
 
@@ -161,9 +191,9 @@ public class ProjectQueries {
 
 //            query3(db);
 //            query4(db);
-//            query5(db);
-            query6(db);
-//            query7(db);
+       //     query5(db);
+     //       query6(db);
+            query7(db);
 //            query8(db);
 
 
