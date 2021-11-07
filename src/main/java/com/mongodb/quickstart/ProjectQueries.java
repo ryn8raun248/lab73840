@@ -133,8 +133,6 @@ public class ProjectQueries {
         }
         System.out.println();
 
-
-
     }
 
     public static void query7(MongoDatabase db){
@@ -165,8 +163,7 @@ public class ProjectQueries {
                 actorsNotComedies.add(actor);
             }
         }
-        List<String> sortedActorsNotComedies = actorsNotComedies.stream().distinct().collect(Collectors.toList()); // get rid of duplicate actor names
-        for (String actor : sortedActorsNotComedies){
+        for (String actor : actorsNotComedies){
            System.out.println(actor);
         }
         System.out.println();
