@@ -172,9 +172,37 @@ public class ProjectQueries {
 
     public static void query8(MongoDatabase db){
         // Which actors have appeared in comedy and action adventure movies?
-        MongoCollection<Document> video_actors = db.getCollection("video_actors");
-        MongoCollection<Document> video_recordings = db.getCollection("video_recordings");
-        System.out.println("Query 8:");
+
+        MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
+        System.out.println("Query 8:" + "\n");
+
+        Bson projectPipeline = project(fields(include("name", "Categories")));
+        Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"));
+        Bson unwindPipeline = unwind("$Categories");
+
+        AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
+                projectPipeline, unwindPipeline, groupPipeline
+        ));
+
+        ArrayList<String> actorsInBoth = new ArrayList<>();
+        for(Document doc : temp){
+            ArrayList<String> categoriesList = new ArrayList<>();
+            ArrayList<Document> docList = (ArrayList)doc.get("Categories");
+            String actor = (String) doc.get("_id");
+
+            for (Document element : docList) {
+                String categoryType = (String) element.get("Category");
+                categoriesList.add(categoryType);
+            }
+            if (categoriesList.contains("Comedy") && categoriesList.contains("Action & Adventure")) {
+                actorsInBoth.add(actor);
+            }
+        }
+        for (String actor : actorsInBoth){
+            System.out.println(actor);
+        }
+        System.out.println();
+
     }
 
         public static void main(String[] args) {
@@ -191,8 +219,8 @@ public class ProjectQueries {
 //            query4(db);
        //     query5(db);
      //       query6(db);
-            query7(db);
-//            query8(db);
+       //     query7(db);
+            query8(db);
 
 
         }
