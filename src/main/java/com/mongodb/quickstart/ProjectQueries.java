@@ -34,22 +34,22 @@ public class ProjectQueries {
         File file = new File("C:\\Users\\rhodesk\\IdeaProjects\\lab73840\\src\\main\\java\\com\\mongodb\\quickstart\\updated_real.json");
         List<String> lines = Files.readAllLines(file.toPath());
         int realIndex = 0;
-        for(Document doc: thing){
+        for (Document doc : thing) {
 
-                ArrayList<Document> documents = new ArrayList<>();
-                int index = (lines.get(realIndex).indexOf("categories"));
-                String temp = lines.get(realIndex).substring(index+13, lines.get(realIndex).lastIndexOf('"'));
-                String[] categories = temp.split(",");
-                for(String category: categories) {
-                    documents.add(new Document("Category", category));
-                }
-                doc.append("Categories", documents);
-                db.getCollection("new_video_actors").insertOne(doc);
-                realIndex++;
+            ArrayList<Document> documents = new ArrayList<>();
+            int index = (lines.get(realIndex).indexOf("categories"));
+            String temp = lines.get(realIndex).substring(index + 13, lines.get(realIndex).lastIndexOf('"'));
+            String[] categories = temp.split(",");
+            for (String category : categories) {
+                documents.add(new Document("Category", category));
+            }
+            doc.append("Categories", documents);
+            db.getCollection("new_video_actors").insertOne(doc);
+            realIndex++;
         }
     }
 
-    public static void query3(MongoDatabase db){
+    public static void query3(MongoDatabase db) {
         // Number of videos for each category
         MongoCollection<Document> videoColl = db.getCollection("video_recordings");
         System.out.println("Query 3:");
@@ -63,8 +63,8 @@ public class ProjectQueries {
     }
 
 
-    public static void query4(MongoDatabase db){
-    // List the number of videos for each video category where the inventory is non-zero.
+    public static void query4(MongoDatabase db) {
+        // List the number of videos for each video category where the inventory is non-zero.
         MongoCollection<Document> videoColl = db.getCollection("video_recordings");
         System.out.println("Query 4:");
         AggregateIterable<Document> nonZeroCounts = videoColl.aggregate(Arrays.asList(
@@ -79,7 +79,7 @@ public class ProjectQueries {
 
     }
 
-    public static void query5(MongoDatabase db){
+    public static void query5(MongoDatabase db) {
         // For each actor, list the video categories.
         // use the $lookup command to join collections
         MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
@@ -90,16 +90,15 @@ public class ProjectQueries {
         Bson unwindPipeline = unwind("$Categories");
 
         AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
-            projectPipeline, unwindPipeline, groupPipeline
+                projectPipeline, unwindPipeline, groupPipeline
         ));
 
 
-
-        for(Document doc : temp){
+        for (Document doc : temp) {
             System.out.print(doc.get("_id") + ":");
-            ArrayList<Document> docList = (ArrayList)doc.get("Categories");
+            ArrayList<Document> docList = (ArrayList) doc.get("Categories");
 
-            for(Document element: docList){
+            for (Document element : docList) {
                 System.out.print(" " + element.get("Category") + ",");
             }
             System.out.println();
@@ -107,7 +106,7 @@ public class ProjectQueries {
         System.out.println();
     }
 
-    public static void query6(MongoDatabase db){
+    public static void query6(MongoDatabase db) {
         //Which actors have appeared in movies in different video categories?
         MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
 
@@ -115,9 +114,8 @@ public class ProjectQueries {
 
         Bson projectPipeline = project(fields(include("name", "Categories")));
         Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"),
-                Accumulators.sum("number",1 ));
+                Accumulators.sum("number", 1));
         Bson filterPipeline = match(Filters.gt("number", 1));
-
 
 
         AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
@@ -125,7 +123,7 @@ public class ProjectQueries {
         ));
 
 
-        for(Document doc : temp){
+        for (Document doc : temp) {
             System.out.print(doc.get("_id") + ": ");
 
             System.out.print("Number of categories, " + doc.get("number"));
@@ -133,9 +131,10 @@ public class ProjectQueries {
         }
         System.out.println();
 
+
     }
 
-    public static void query7(MongoDatabase db){
+    public static void query7(MongoDatabase db) {
         // Which actors have not appeared in a comedy?
 
         MongoCollection<Document> video_actors = db.getCollection("new_video_actors");
@@ -144,30 +143,23 @@ public class ProjectQueries {
         Bson projectPipeline = project(fields(include("name", "Categories")));
         Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"));
         Bson unwindPipeline = unwind("$Categories");
+        Bson filterPipeline = match(Filters.nin("Categories", new Document("Category", "Comedy")));
 
         AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
-                projectPipeline, unwindPipeline, groupPipeline
+                projectPipeline, unwindPipeline, groupPipeline, filterPipeline
         ));
 
-        ArrayList<String> actorsNotComedies = new ArrayList<>();
-        for(Document doc : temp){
-            ArrayList<String> categoriesList = new ArrayList<>();
-            ArrayList<Document> docList = (ArrayList)doc.get("Categories");
-            String actor = (String) doc.get("_id");
+
+        for (Document doc : temp) {
+            System.out.print(doc.get("_id") + ":");
+            ArrayList<Document> docList = (ArrayList) doc.get("Categories");
 
             for (Document element : docList) {
-                String categoryType = (String) element.get("Category");
-                categoriesList.add(categoryType);
+                System.out.print(" " + element.get("Category") + ",");
             }
-            if (!categoriesList.contains("Comedy")) {
-                actorsNotComedies.add(actor);
-            }
-        }
-        for (String actor : actorsNotComedies){
-           System.out.println(actor);
+            System.out.println();
         }
         System.out.println();
-
     }
 
     public static void query8(MongoDatabase db){
@@ -219,8 +211,8 @@ public class ProjectQueries {
 //            query4(db);
        //     query5(db);
      //       query6(db);
-       //     query7(db);
-            query8(db);
+            query7(db);
+            //query8(db);
 
 
         }
