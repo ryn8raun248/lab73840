@@ -4,22 +4,16 @@ import com.mongodb.client.*;
 import com.mongodb.client.model.Accumulators;
 
 import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 
-import javax.print.Doc;
+
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.Arrays.*;
-import java.util.stream.Collectors;
 
 
 import static com.mongodb.client.model.Aggregates.*;
@@ -171,29 +165,18 @@ public class ProjectQueries {
         Bson projectPipeline = project(fields(include("name", "Categories")));
         Bson groupPipeline = group("$name", Accumulators.addToSet("Categories", "$Categories"));
         Bson unwindPipeline = unwind("$Categories");
+        Bson matchPipeline = match(Filters.and(Filters.in("Categories", new Document("Category", "Action & Adventure")),
+                Filters.in("Categories", new Document("Category", "Comedy"))));
 
         AggregateIterable<Document> temp = video_actors.aggregate(Arrays.asList(
-                projectPipeline, unwindPipeline, groupPipeline
+                projectPipeline, unwindPipeline, groupPipeline, matchPipeline
         ));
 
-        ArrayList<String> actorsInBoth = new ArrayList<>();
-        for(Document doc : temp){
-            ArrayList<String> categoriesList = new ArrayList<>();
-            ArrayList<Document> docList = (ArrayList)doc.get("Categories");
-            String actor = (String) doc.get("_id");
-
-            for (Document element : docList) {
-                String categoryType = (String) element.get("Category");
-                categoriesList.add(categoryType);
-            }
-            if (categoriesList.contains("Comedy") && categoriesList.contains("Action & Adventure")) {
-                actorsInBoth.add(actor);
-            }
-        }
-        for (String actor : actorsInBoth){
-            System.out.println(actor);
+        for(Document doc: temp){
+            System.out.println(doc.get("_id"));
         }
         System.out.println();
+
 
     }
 
@@ -205,14 +188,12 @@ public class ProjectQueries {
 
         try (MongoClient mongoClient = MongoClients.create(System.getProperty("mongodb.uri"))) {
             MongoDatabase db = mongoClient.getDatabase("videos");
-            MongoDatabase db_test = mongoClient.getDatabase("test2");
-
-//            query3(db);
-//            query4(db);
-       //     query5(db);
-     //       query6(db);
+            query3(db);
+            query4(db);
+            query5(db);
+            query6(db);
             query7(db);
-            //query8(db);
+            query8(db);
 
 
         }
